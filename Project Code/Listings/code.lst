@@ -1,0 +1,285 @@
+C51 COMPILER V9.60.7.0   CODE                                                              01/26/2025 14:51:34 PAGE 1   
+
+
+C51 COMPILER V9.60.7.0, COMPILATION OF MODULE CODE
+OBJECT MODULE PLACED IN .\Objects\code.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE code.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\code
+                    -.lst) TABS(2) OBJECT(.\Objects\code.obj)
+
+line level    source
+
+   1          // Microcontroller Based Password Security System
+   2          
+   3          #include <reg51.h>
+   4          
+   5          // connected pins
+   6          
+   7          // keypad rows
+   8          sbit keyrow1 = P2 ^ 0;
+   9          sbit keyrow2 = P2 ^ 1;
+  10          sbit keyrow3 = P2 ^ 2;
+  11          sbit keyrow4 = P2 ^ 3;
+  12          //keypad column
+  13          sbit keycolumn1 = P3 ^ 0;
+  14          sbit keycolumn2 = P3 ^ 1;
+  15          sbit keycolumn3 = P3 ^ 2;
+  16          // motor pins
+  17          sbit motorpin1 = P3 ^ 3;
+  18          sbit motorpin2 = P3 ^ 4;
+  19          // led pins
+  20          sbit rs = P3 ^ 5;
+  21          sbit rw = P3 ^ 6;
+  22          sbit en = P3 ^ 7;
+  23          
+  24          //functions
+  25          void lcdcmd(unsigned char);
+  26          void lcddat(unsigned char);
+  27          void lcddisplay(unsigned char *q);
+  28          char keypad();
+  29          void check();
+  30          void delay(unsigned int);
+  31          unsigned char pin[] = {"12345"};
+  32          unsigned char Epin[5];
+  33          
+  34          // main function
+  35          void main()
+  36          {
+  37   1          lcdcmd(0x0F); //decimal value: 15
+  38   1          lcdcmd(0x38); //decimal value: 56
+  39   1          lcdcmd(0x01); //decimal value: 1
+  40   1      
+  41   1          while (1)
+  42   1          {
+  43   2              unsigned int i = 0;
+  44   2              lcdcmd(0x80); //decimal value: 128
+  45   2              lcddisplay("ENTER PIN");
+  46   2              delay(1000);
+  47   2              lcdcmd(0xc0); //decimal value: 192
+  48   2              while (pin[i] != '\0')
+  49   2              {
+  50   3                  Epin[i] = keypad();
+  51   3                  delay(1000);
+  52   3                  i++;
+  53   3              }
+  54   2              check();
+C51 COMPILER V9.60.7.0   CODE                                                              01/26/2025 14:51:34 PAGE 2   
+
+  55   2          }
+  56   1      }
+  57          
+  58          //delay function
+  59          void delay(unsigned int j)
+  60          {
+  61   1          int a, b;
+  62   1          for (a = 0; a < j; a++)
+  63   1          {
+  64   2              for (b = 0; b < 10; b++)
+  65   2                  ;
+  66   2          }
+  67   1      }
+  68          
+  69          // lcd commands functions
+  70          void lcdcmd(unsigned char A)
+  71          {
+  72   1          P1 = A;
+  73   1          rs = 0;
+  74   1          rw = 0;
+  75   1          en = 1;
+  76   1          delay(1000);
+  77   1          en = 0;
+  78   1      }
+  79          
+  80          //lcd data function
+  81          void lcddat(unsigned char i)
+  82          {
+  83   1          P1 = i;
+  84   1          rs = 1;
+  85   1          rw = 0;
+  86   1          en = 1;
+  87   1          delay(1000);
+  88   1          en = 0;
+  89   1      }
+  90          
+  91          //lcd display charecters function
+  92          void lcddisplay(unsigned char *q)
+  93          {
+  94   1          int k;
+  95   1          for (k = 0; q[k] != '\0'; k++)
+  96   1          {
+  97   2              lcddat(q[k]);
+  98   2          }
+  99   1          delay(10000);
+ 100   1      }
+ 101          
+ 102          // assign keypad character value function
+ 103          char keypad()
+ 104          {
+ 105   1          int x = 0;
+ 106   1          while (x == 0)
+ 107   1          {
+ 108   2              // assign values for first row
+ 109   2              keyrow1 = 0;
+ 110   2              keyrow2 = 1;
+ 111   2              keyrow3 = 1;
+ 112   2              keyrow4 = 1;
+ 113   2              if (keycolumn1 == 0)
+ 114   2              {
+ 115   3                  lcddat('*');
+ 116   3                  delay(1000);
+C51 COMPILER V9.60.7.0   CODE                                                              01/26/2025 14:51:34 PAGE 3   
+
+ 117   3                  x = 1;
+ 118   3                  return '1';
+ 119   3              }
+ 120   2              if (keycolumn2 == 0)
+ 121   2              {
+ 122   3                  lcddat('*');
+ 123   3                  delay(1000);
+ 124   3                  x = 1;
+ 125   3                  return '2';
+ 126   3              }
+ 127   2              if (keycolumn3 == 0)
+ 128   2              {
+ 129   3                  lcddat('*');
+ 130   3                  delay(1000);
+ 131   3                  x = 1;
+ 132   3                  return '3';
+ 133   3              }
+ 134   2              // assign values for second row
+ 135   2              keyrow1 = 1;
+ 136   2              keyrow2 = 0;
+ 137   2              keyrow3 = 1;
+ 138   2              keyrow4 = 1;
+ 139   2      
+ 140   2              if (keycolumn1 == 0)
+ 141   2              {
+ 142   3                  lcddat('*');
+ 143   3                  delay(1000);
+ 144   3                  x = 1;
+ 145   3                  return '4';
+ 146   3              }
+ 147   2              if (keycolumn2 == 0)
+ 148   2              {
+ 149   3                  lcddat('*');
+ 150   3                  delay(1000);
+ 151   3                  x = 1;
+ 152   3                  return '5';
+ 153   3              }
+ 154   2              if (keycolumn3 == 0)
+ 155   2              {
+ 156   3                  lcddat('*');
+ 157   3                  delay(1000);
+ 158   3                  x = 1;
+ 159   3                  return '6';
+ 160   3              }
+ 161   2      
+ 162   2              // assign values for third row
+ 163   2              keyrow1 = 1;
+ 164   2              keyrow2 = 1;
+ 165   2              keyrow3 = 0;
+ 166   2              keyrow4 = 1;
+ 167   2              if (keycolumn1 == 0)
+ 168   2              {
+ 169   3                  lcddat('*');
+ 170   3                  delay(1000);
+ 171   3                  x = 1;
+ 172   3                  return '7';
+ 173   3              }
+ 174   2              if (keycolumn2 == 0)
+ 175   2              {
+ 176   3                  lcddat('*');
+ 177   3                  delay(1000);
+ 178   3                  x = 1;
+C51 COMPILER V9.60.7.0   CODE                                                              01/26/2025 14:51:34 PAGE 4   
+
+ 179   3                  return '8';
+ 180   3              }
+ 181   2              if (keycolumn3 == 0)
+ 182   2              {
+ 183   3                  lcddat('*');
+ 184   3                  delay(1000);
+ 185   3                  x = 1;
+ 186   3                  return '9';
+ 187   3              }
+ 188   2      
+ 189   2              // assign values for forth row
+ 190   2              keyrow1 = 1;
+ 191   2              keyrow2 = 1;
+ 192   2              keyrow3 = 1;
+ 193   2              keyrow4 = 0;
+ 194   2      
+ 195   2              if (keycolumn1 == 0)
+ 196   2              {
+ 197   3                  lcddat('*');
+ 198   3                  delay(1000);
+ 199   3                  x = 1;
+ 200   3                  return '*';
+ 201   3              }
+ 202   2              if (keycolumn2 == 0)
+ 203   2              {
+ 204   3                  lcddat('*');
+ 205   3                  delay(1000);
+ 206   3                  x = 1;
+ 207   3                  return '0';
+ 208   3              }
+ 209   2              if (keycolumn3 == 0)
+ 210   2              {
+ 211   3                  lcddat('*');
+ 212   3                  delay(1000);
+ 213   3                  x = 1;
+ 214   3                  return '#';
+ 215   3              }
+ 216   2          }
+ 217   1      }
+ 218          
+ 219          // password check function
+ 220          void check()
+ 221          {
+ 222   1          //  compare the input value with the assign password value
+ 223   1          if (pin[0] == Epin[0] && pin[1] == Epin[1] && pin[2] == Epin[2] && pin[3] == Epin[3] && pin[4] == Epin
+             -[4])
+ 224   1          {
+ 225   2              delay(1000);
+ 226   2              lcdcmd(0x01); //decimal value: 1
+ 227   2              lcdcmd(0x81); //decimal value: 129
+ 228   2              // show pin is correct
+ 229   2              lcddisplay("PIN CORRECT");
+ 230   2              delay(1000);
+ 231   2              // door motor will run
+ 232   2              motorpin1 = 1;
+ 233   2              motorpin2 = 0;
+ 234   2              lcdcmd(0xc1); //decimal value: 193
+ 235   2              // show the door is unlocked
+ 236   2              lcddisplay("DOOR OPENED");
+ 237   2              delay(10000);
+ 238   2              motorpin1 = 1;
+ 239   2              motorpin2 = 0;
+C51 COMPILER V9.60.7.0   CODE                                                              01/26/2025 14:51:34 PAGE 5   
+
+ 240   2              lcdcmd(0x01); //decimal value: 1
+ 241   2          }
+ 242   1          else
+ 243   1          {
+ 244   2              lcdcmd(0x01); //decimal value: 1
+ 245   2              lcdcmd(0x80); //decimal value: 128
+ 246   2              lcddisplay("WRONG PIN");
+ 247   2              delay(1000);
+ 248   2              lcdcmd(0x01); //decimal value: 1
+ 249   2          }
+ 250   1      }
+ 251          // end
+*** WARNING C291 IN LINE 217 OF code.c: not every exit path returns a value
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    463    ----
+   CONSTANT SIZE    =     44    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     11       7
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  1 WARNING(S),  0 ERROR(S)
